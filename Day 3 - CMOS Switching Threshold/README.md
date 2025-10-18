@@ -72,16 +72,31 @@ run
 
 ```
 
-**`PULSE` Parameters Explained:**
+### ⚡ SPICE `PULSE` Parameters
 
-  * `0`: Initial voltage (0V)
-  * `2.5`: Pulsed voltage (2.5V)
-  * `0`: Delay before pulse starts (0s)
-  * `10p`: Rise time (10ps)
-  * `10p`: Fall time (10ps)
-  * `1n`: Pulse width (1ns)
-  * `2n`: Pulse period (2ns)
+The `PULSE` function in your SPICE netlist defines a repeating voltage pulse, which is essential for dynamic (transient) analysis to measure properties like delay. For your specific line, `PULSE(0V 1.8V 0 0.1ns 0.1ns 2ns 4ns)`, the parameters are:
 
+* **Initial Voltage (`0V`):** The voltage level before the pulse begins.
+* **Pulsed Voltage (`1.8V`):** The peak voltage level of the pulse.
+* **Delay (`0`):** The time delay before the first pulse starts.
+* **Rise Time (`0.1ns`):** The time it takes for the voltage to transition from the initial to the pulsed level.
+* **Fall Time (`0.1ns`):** The time it takes for the voltage to transition from the pulsed back to the initial level.
+* **Pulse Width (`2ns`):** The duration the signal stays at the pulsed voltage level.
+* **Period (`4ns`):** The total time for one complete cycle of the pulse.
+
+---
+
+### 📊 Image Analysis: Inverter Sizing and VTC
+> <img width="1920" height="1080" alt="statc behaviour evaluation" src="https://github.com/user-attachments/assets/6cb2a5db-dac8-499e-b51b-55315e257a4f" />
+
+This image visually demonstrates how **transistor sizing** directly impacts an inverter's static behavior, specifically its **Voltage Transfer Characteristic (VTC)** and **switching threshold ($V_M$)**.
+
+
+* **Left Plot:** This shows the VTC for an inverter where the PMOS and NMOS transistors have the **same W/L ratio** (1.5). The switching threshold (the center of the steep transition) is visibly to the left of the midpoint (0.9V), indicating that the NMOS is stronger than the PMOS for the same dimensions.
+
+* **Right Plot:** Here, the **PMOS width has been increased**, making its W/L ratio 2.5 times larger than the NMOS (3.75 vs 1.5). This makes the pull-up network stronger.
+
+* **Key Takeaway:** By strengthening the PMOS, the **switching threshold ($V_M$) is shifted to a higher voltage**, closer to the ideal center of $V_{dd}/2$. This technique is used to create a more symmetric VTC, which improves the inverter's noise margins and helps balance its rise and fall delays.
 -----
 
 ### 📊 Plots & Figures
