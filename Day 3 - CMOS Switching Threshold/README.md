@@ -16,43 +16,60 @@ Two primary simulations were performed: a DC sweep for static analysis and a tra
 This netlist sweeps the input voltage from 0 to 2.5V to generate the VTC curve and find the switching threshold.
 
 ```spice
-* Day 3: CMOS Inverter VTC Simulation for Vm Extraction
-.include sky130.lib.spice
+*Model Description
+.param temp=27
 
-* Transistor Definitions: M<name> <drain> <gate> <source> <body> <model>
-M1 out in vdd vdd sky130_fd_pr__pfet_01v8 W=0.375u L=0.25u
-M2 out in 0 0 sky130_fd_pr__nfet_01v8 W=0.375u L=0.25u
 
-* Load Capacitor
-Cload out 0 10f
+*Including sky130 library files
+.lib "sky130_fd_pr/models/sky130.lib.spice" tt
 
-* Power and Input Voltage Sources
-Vdd vdd 0 2.5
-Vin in 0 2.5
+*Netlist Description
 
-* DC Analysis: Sweep Vin from 0 to 2.5V
-.dc Vin 0 2.5 0.05
+XM1 out in vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=0.15
+XM2 out in 0 0 sky130_fd_pr__nfet_01v8 w=0.36 l=0.15
+
+Cload out 0 50fF
+Vdd vdd 0 1.8V
+Vin in 0 1.8V
+
+*simulation commands
+.op
+.dc Vin 0 1.8 0.01
+.control
+run
+setplot dc1
+display
+.endc
 
 .end
+
 ```
 
 **2. Netlist for Transient Simulation (Dynamic Analysis)**
 This netlist uses a `PULSE` input to simulate the inverter's response over time and measure delays.
 
 ```spice
-* Day 3: Transient simulation with a PULSE input to measure delay
-.include sky130.lib.spice
+*Model Description
+.param temp=27
 
-* Circuit components are the same as above (M1, M2, Cload, Vdd)
+*Including sky130 library files
+.lib "sky130_fd_pr/models/sky130.lib.spice" tt
 
-* Pulsed Input Voltage Source
-* Format: PULSE(V1 V2 Tdelay Trise Tfall Ton Tperiod)
-Vin in 0 pulse(0 2.5 0 10p 10p 1n 2n)
+*Netlist Description
 
-* Transient Analysis: Run simulation for 4ns with 1ps steps
-.tran 1p 4n
+XM1 out in vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=0.15
+XM2 out in 0 0 sky130_fd_pr__nfet_01v8 w=0.36 l=0.15
+Cload out 0 50fF
+Vdd vdd 0 1.8V
+Vin in 0 PULSE(0V 1.8V 0 0.1ns 0.1ns 2ns 4ns)
 
+*simulation commands
+.tran 1n 10n
+.control
+run
+.endc
 .end
+
 ```
 
 **`PULSE` Parameters Explained:**
@@ -106,7 +123,7 @@ The simulation results provide a clear, quantitative look at the inverter's beha
 The **switching threshold ($V_M$)** is the input voltage at which `$V_{in} = V_{out}$`. This point represents the center of the logic transition and is a key indicator of an inverter's robustness. An ideal inverter has `$V_M = V_{dd}/2`, which gives it symmetric noise margins against unwanted voltage fluctuations.
 
 
-*(Image: `vgs = vds.jpg`)*
+*<img width="1920" height="1080" alt="vgs = vds" src="https://github.com/user-attachments/assets/87cf410c-5eb6-484a-832c-fca38d81fed0" />*
 
 As shown in the VTC plot, the curve's shape is determined by which operating region (cutoff, linear, or saturation) the PMOS and NMOS transistors are in at each input voltage.
 
@@ -117,7 +134,7 @@ As shown in the VTC plot, the curve's shape is determined by which operating reg
 The value of $V_M$ is determined by the relative current-driving strengths of the PMOS and NMOS transistors. At the switching threshold, both transistors are in the saturation region, and the pull-up current from the PMOS must exactly balance the pull-down current from the NMOS.
 
 
-*(Image: `derivation for vm.jpg`)*
+*<img width="1920" height="1080" alt="derivation for vm" src="https://github.com/user-attachments/assets/1d770009-b064-4503-84bf-e269f8a3c0c0" />*
 
 The derivation starts from the equilibrium condition:
 $$I_{dsn} = |I_{dsp}| \quad \text{or} \quad I_{dsn} + I_{dsp} = 0$$
@@ -138,7 +155,7 @@ This derivation proves that the switching threshold `$V_M$` is fundamentally det
 The analytical formula is confirmed through simulation. By varying the PMOS width and running both **static (DC)** and **dynamic (transient)** analyses, we can observe the direct impact on inverter performance.
 
 
-*(Image: `comparison table.jpg`)*
+*<img width="1920" height="1080" alt="comparison table" src="https://github.com/user-attachments/assets/13aefe09-1574-47bb-8f4b-7d5ff5b9a3f3" />*
 
 * **Static Impact ($V_M$):** As the PMOS width `Wp` increases, the ratio `R` increases, which mathematically and experimentally pushes the switching threshold `$V_M$` to a higher voltage. This is because a stronger pull-up network requires a higher input voltage to be overcome by the pull-down network.
 * **Dynamic Impact (Delay):** As the PMOS gets stronger, the inverter's **rise delay decreases** (faster pull-up), but its **fall delay increases** (slower pull-down). The table shows that a ratio of `Wp/Lp ≈ 2 * Wn/Ln` results in nearly **equal rise and fall delays**.
@@ -150,7 +167,7 @@ The analytical formula is confirmed through simulation. By varying the PMOS widt
 This concept of balanced sizing is critical in real-world applications, especially in **clock distribution networks**.
 
 
-*(Image: `Screenshot 2025-10-18 175124.jpg`)*
+*<img width="1920" height="1080" alt="Screenshot 2025-10-18 175124" src="https://github.com/user-attachments/assets/7b424ce8-058f-493b-8c30-72411fad5dc5" />*
 
 Inverters are used as **clock buffers** to regenerate the clock signal and drive it across the chip. For a clock signal to be reliable, its high and low phases must have equal duration (a 50% duty cycle). If a buffer has unequal rise and fall times, it will cause **duty cycle distortion**. By sizing the inverters for balanced delays, we ensure the clock signal's integrity. These characterized delays are also fundamental inputs for **Static Timing Analysis (STA)**, which verifies that all signals in the chip arrive at their destinations on time.
 
