@@ -135,9 +135,9 @@ The simulation results provide a clear, quantitative look at the inverter's beha
 
 ### The Switching Threshold ($V_M$)
 
-The **switching threshold ($V_M$)** is the input voltage at which `$V_{in} = V_{out}$`. This point represents the center of the logic transition and is a key indicator of an inverter's robustness. An ideal inverter has a `$V_M = V_{dd}/2$`.
+The **switching threshold ($V_M$)** is the input voltage at which $V_{in} = V_{out}$. This point represents the center of the logic transition and is a key indicator of an inverter's robustness. An ideal inverter has a $V_M = V_{dd}/2$.
 
-Our simulation with `$W/L = 0.375u/0.25u$` for both transistors yields a `$V_M \approx 0.876V$`. Since this is less than the ideal `$V_{dd}/2 = 1.25V$`, it indicates the NMOS is stronger than the PMOS for the same dimensions.
+Our simulation with $W/L = 0.375u/0.25u$ for both transistors yields a $V_M \approx 0.876V$. Since this is less than the ideal $V_{dd}/2 = 1.25V$, it indicates the NMOS is stronger than the PMOS for the same dimensions.
 
 *<img width="1920" height="1080" alt="vgs = vds" src="https://github.com/user-attachments/assets/87cf410c-5eb6-484a-832c-fca38d81fed0" />*
 *As shown in the VTC plot, the curve's shape is determined by which operating region (cutoff, linear, or saturation) the PMOS and NMOS transistors are in at each input voltage.*
@@ -146,27 +146,27 @@ Our simulation with `$W/L = 0.375u/0.25u$` for both transistors yields a `$V_M \
 
 ### Analytical Derivation of $V_M$ 🧪
 
-The value of `$V_M$` is determined by the relative current-driving strengths of the PMOS and NMOS transistors. At the switching threshold, both transistors are in the saturation region, and their currents must be equal.
+The value of $V_M$ is determined by the relative current-driving strengths of the PMOS and NMOS transistors. At the switching threshold, both transistors are in the saturation region, and their currents must be equal.
 *<img width="1920" height="1080" alt="derivation for vm" src="https://github.com/user-attachments/assets/1d770009-b064-4503-84bf-e269f8a3c0c0" />*
 The derivation starts from the equilibrium condition:
 $$I_{dsn} = |I_{dsp}| \quad \text{which is equivalent to} \quad I_{dsn} + I_{dsp} = 0$$
 
-Using the velocity-saturated current model (where `$V_{gt} = V_{gs} - V_t$`):
+Using the velocity-saturated current model (where $V_{gt} = V_{gs} - V_t$):
 
-* **For NMOS**, where `$V_{gsn} = V_M$`:
+* **For NMOS**, where $V_{gsn} = V_M$:
   
     $$I_{dsn} = k_n \cdot \left[ (V_M - V_{tn})V_{dsatn} - \frac{V_{dsatn}^2}{2} \right]$$
 
-* **For PMOS**, where `$V_{gsp} = V_M - V_{dd}$`:
+* **For PMOS**, where $V_{gsp} = V_M - V_{dd}$:
   
     $$I_{dsp} = k_p \cdot \left[ (V_M - V_{dd} - V_{tp})V_{dsatp} - \frac{V_{dsatp}^2}{2} \right]$$
 
-Setting the sum of the currents to zero and solving for `$V_M$` yields the final expression, which is dependent on a ratio `R` that encapsulates the relative strengths of the devices: 
+Setting the sum of the currents to zero and solving for $V_M$ yields the final expression, which is dependent on a ratio `R` that encapsulates the relative strengths of the devices: 
 
 $$R = \frac{k_p \cdot V_{dsatp}}{k_n \cdot V_{dsatn}} = \frac{\mu_p C_{ox} (\frac{W}{L})_p \cdot V_{dsatp}}{\mu_n C_{ox} (\frac{W}{L})_n \cdot V_{dsatn}} = \frac{(\frac{W}{L})_p}{(\frac{W}{L})_n} \cdot \frac{k_p' V_{dsatp}}{k_n' V_{dsatn}}$$
 
 
-This derivation proves that the switching threshold `$V_M$` is fundamentally determined by the **W/L sizing ratio** of the PMOS to the NMOS.
+This derivation proves that the switching threshold $V_M$ is fundamentally determined by the **W/L sizing ratio** of the PMOS to the NMOS.
 
 ### Impact of Transistor Sizing
 
@@ -174,9 +174,9 @@ The analytical formula is confirmed through simulation. By varying the PMOS widt
 
 *<img width="1920" height="1080" alt="comparison table" src="https://github.com/user-attachments/assets/13aefe09-1574-47bb-8f4b-7d5ff5b9a3f3" />*
 
-  * **Static Impact ($V_M$):** As the PMOS width `Wp` increases, the ratio `R` increases, which mathematically and experimentally pushes the switching threshold `$V_M$` to a higher voltage. This is because a stronger pull-up network requires a higher input voltage to be overcome by the pull-down network.
+  * **Static Impact ($V_M$):** As the PMOS width `Wp` increases, the ratio `R` increases, which mathematically and experimentally pushes the switching threshold $V_M$ to a higher voltage. This is because a stronger pull-up network requires a higher input voltage to be overcome by the pull-down network.
 
-  * **Dynamic Impact (Delay):** As the PMOS gets stronger, the inverter's **rise delay decreases** (faster pull-up), but its **fall delay increases**. The table shows that a ratio of `$W_p / L_p \approx 2 \times W_n / L_n$` results in nearly **equal rise and fall delays**, a key characteristic for components like clock buffers. Our own simulation measured a rise delay of **330 ps**.
+  * **Dynamic Impact (Delay):** As the PMOS gets stronger, the inverter's **rise delay decreases** (faster pull-up), but its **fall delay increases**. The table shows that a ratio of $W_p / L_p \approx 2 \times W_n / L_n$ results in nearly **equal rise and fall delays**, a key characteristic for components like clock buffers. Our own simulation measured a rise delay of **330 ps**.
 
 ### Applications in Clock Networks 🕒
 
