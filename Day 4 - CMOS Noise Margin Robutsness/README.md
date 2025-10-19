@@ -95,6 +95,7 @@ This table summarizes the trend as the PMOS width (`Wp`) is scaled relative to t
 ### Calculating the Noise Margins 🧮
 
 Using the four key voltage parameters extracted from the VTC, we can calculate the noise margins. These values quantify the inverter's tolerance to noise for both logic states.
+> <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/85a6dcd9-a2c4-4f82-95fd-e463435968aa" />
 
 * **High Noise Margin ($NM_H$):** This is the tolerance to noise when the input is intended to be high.
     $$NM_H = V_{OH} - V_{IH}$$
